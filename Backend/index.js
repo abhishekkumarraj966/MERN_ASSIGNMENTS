@@ -1,37 +1,30 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const routes = require('./routes/routes');
-const port =8080
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const port = 3001;
+const EmpoloyeeModel = require("./model/model");
 
-//transferring the context of app to express
 const app = express();
 
-//listing on the port 3000
-
 app.use(express.json());
+app.use(cors());
 
-app.listen(8080, () => {
-    console.log(`Server Started at ${port}`)
-})
+mongoose.connect("mongodb://127.0.0.1:27017/employee");
 
-//http://localhost:3000/api/post
-//http://localhost:3000/api/getAll
-require('dotenv').config();
 
-const mongoString = process.env.DATABASE_URL
-
-mongoose.connect(mongoString, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+app.get("/register", (req, res) => {
+    EmployeeModel.find()
+      .then((employee) => res.json(employee))
+      .catch((err) => res.json(err));
   });
-const database = mongoose.connection
+  
 
-database.on('error', (error) => {
-    console.log(error)
-})
+app.post("/register", (req, res) => {
+  EmpoloyeeModel.create(req.body)
+    .then((employee) => res.json(employee))
+    .catch((err) => res.json(err));
+});
 
-database.once('connected', () => {
-    console.log('Database Connected');
-})
-
-app.use('/api', routes)
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
